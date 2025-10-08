@@ -1,6 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI  # Imports the FastAPI class so we can create a FastAPI application
 
-app = FastAPI()
+app = FastAPI() # Creates a FastAPI application instance — this is the main entry point of the API
 # Example data list (Books data)
 BOOKS = [
     {'title': 'Title One', 'author': 'Author One', 'category': 'science'},
@@ -54,8 +54,20 @@ async def read_book(book_title:str):
     return {"message": "Book not found"}
 @app.get("/books/") # http://127.0.0.1:8000/books/?category=math
 async def read_book(category: str):
-    books_to_return=[]
-    for book in BOOKS:
-        if book.get('category').casefold()==category.casefold():
-            books_to_return.append(book)
-    return books_to_return
+    books_to_return=[] # Create an empty list to store matching books
+    for book in BOOKS: # Loop through each book in the BOOKS list
+        if book.get('category').casefold()==category.casefold():  # Compare book's category with given category (case-insensitive)
+            books_to_return.append(book)  # If category matches, add book to result list
+    return books_to_return # Return the list of matching books
+
+@app.get("/books/{book_author}/") # http://127.0.0.1:8000/path_param/author%20four/?category=science 
+# Define a GET endpoint with a path parameter 'book_author'
+async def read_author_category_by_query(book_author: str , category: str):
+    books_to_return=[] # Create an empty list to store books matching the author and category
+    for book in BOOKS: # Loop through each book in the BOOKS list
+        # Check if book's author matches given author (case-insensitive)
+        # AND if book's category matches given category (case-insensitive)
+        if book.get('author').casefold()==book_author.casefold() and \ 
+            book.get('category').casefold()==category.casefold():  
+            books_to_return.append(book) # If both conditions match, add this book to the results list 
+    return books_to_return # Return the list of matching books
