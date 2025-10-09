@@ -1,4 +1,4 @@
-from fastapi import FastAPI  # Imports the FastAPI class so we can create a FastAPI application
+from fastapi import Body, FastAPI # Imports the FastAPI class so we can create a FastAPI application
 
 app = FastAPI() # Creates a FastAPI application instance — this is the main entry point of the API
 # Example data list (Books data)
@@ -70,3 +70,35 @@ async def read_author_category_by_query(book_author: str , category: str):
         if book.get('author').casefold()==book_author.casefold() and book.get('category').casefold()==category.casefold():  
             books_to_return.append(book) # If both conditions match, add this book to the results list 
     return books_to_return # Return the list of matching books
+
+# This FastAPI decorator specifies that when a POST request is made to this URL,
+#    the function below will be executed.
+@app.post("/path_param/create_book")
+
+# This line defines a function named create_book.
+#    'async def' means this is an asynchronous function, allowing fast/efficient co
+
+@app.post("/path_param/create_book")
+
+# This line defines a function named create_book.
+#    'async def' means this is an asynchronous function, allowing fast/efficient co
+
+async def create_book(new_book: dict = Body()):
+
+# new_book is an argument meant to come from the request body
+
+# Here, the new book is being added to the global BOOKS list.
+    BOOKS.append(new_book) # This adds the new book to the list.
+    return {"message": "Book created", "book": new_book}
+
+# This decorator defines a PUT HTTP endpoint at path "path_param/update_book"
+@app.put("path_param/update_book")
+# An asynchronous function to handle the update book request
+async def update_book(updated_book=Body()):
+    # Loop through the list of BOOKS by index
+    for i in range(len(BOOKS)):
+                # Check if the title of the current book matches the title of the incoming updated book (case-insensitive)
+
+        if BOOKS[i].get('title').casefold()==updated_book.get('title').casefold():
+             # Replace the matched book with the updated book data
+            BOOKS[i]=updated_book
