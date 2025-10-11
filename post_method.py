@@ -11,36 +11,40 @@ BOOKS = [
     {'title': 'Title Six', 'author': 'Author Two', 'category': 'math'}
 ]
 
+# ----------------------------------------------------
+# GET method: Root endpoint returns a welcome message
+# ----------------------------------------------------
 @app.get("/")  # Root route: responds to "/"# http://127.0.0.1:8000
 async def root():
     # Return a welcome message at the root URL
     return {"message": "Welcome to the API"}
 
+# ------------------------------
+# GET method: Returns all books
+# ------------------------------
 @app.get("/path_param") # http://127.0.0.1:8000/path_param
 async def read_all_books():
     # Return all books
     return BOOKS
-# -------------------------------
-# Static route (no path parameters)
-# -------------------------------
 
-# When user visits /path_param/mybook
-# this will return a fixed book title
-
+# -----------------------------------------------------------------------
+# # GET method: Returns a fixed book title (Static route example)
+# -----------------------------------------------------------------------
 @app.get("/path_param/mybook") # http://127.0.0.1:8000/path_param/mybook
 async def read_book():
     return {'book title': 'My Favorite Book'}
 
+# -----------------------------------------------------------
+# GET method: Returns the dynamic parameter sent in the path
+# -----------------------------------------------------------
 @app.get("/path_param/{dynamic_param}") # http://127.0.0.1:8000/path_param/pop
 async def read_book(dynamic_param: str):
     # Return the dynamic parameter received in path
     return {'dynamic_param': dynamic_param}
-# -------------------------------
-# Path Parameter Example in FastAPI
-# -------------------------------
 
-# When the user requests /path_param/<book_title>,
-# this route will be triggered
+# -------------------------------------------------------------------
+# GET method: Returns the book matching the title (case-insensitive)
+# -------------------------------------------------------------------
 @app.get("/path_param/{book_title}") # http://127.0.0.1:8000/path_param/title one
 async def read_book(book_title:str):
      # Loop through each book in the BOOKS list
@@ -52,6 +56,10 @@ async def read_book(book_title:str):
             return book
     # If no match is found, return a message
     return {"message": "Book not found"}
+
+# -----------------------------------------------------------------------
+# GET method: Returns list of books filtered by category (query parameter)
+# -----------------------------------------------------------------------
 @app.get("/books/") # http://127.0.0.1:8000/books/?category=math
 async def read_book(category: str):
     books_to_return=[] # Create an empty list to store matching books
@@ -60,6 +68,17 @@ async def read_book(category: str):
             books_to_return.append(book)  # If category matches, add book to result list
     return books_to_return # Return the list of matching books
 
+# -----------------------------------------------------------------------
+# GET method: Returns books filtered by author and category (path and query parameters)
+# -----------------------------------------------------------------------
+@app.get("/path_param/byauthor/{author}")
+async def reads_books_by_author_path(author:str):
+    books_to_return=[]
+    for book in BOOKS:
+        if book.get("author").casefold()==author.casefold():
+            books_to_return.append(book)
+    return books_to_return
+    
 @app.get("/books/{book_author}/") # http://127.0.0.1:8000/path_param/author%20four/?category=science 
 # Define a GET endpoint with a path parameter 'book_author'
 async def read_author_category_by_query(book_author: str , category: str):
@@ -71,29 +90,22 @@ async def read_author_category_by_query(book_author: str , category: str):
             books_to_return.append(book) # If both conditions match, add this book to the results list 
     return books_to_return # Return the list of matching books
 
-# This FastAPI decorator specifies that when a POST request is made to this URL,
-#    the function below will be executed.
+# -----------------------------------------------------------------------
+# POST method: Creates a new book from request body and appends to list
+# -----------------------------------------------------------------------
+# http://127.0.0.1:8000/docs#/default/create_book_path_param_create_book_post
 @app.post("/path_param/create_book")
-
-# This line defines a function named create_book.
-#    'async def' means this is an asynchronous function, allowing fast/efficient co
-
-@app.post("/path_param/create_book")
-
-# This line defines a function named create_book.
-#    'async def' means this is an asynchronous function, allowing fast/efficient co
-
-async def create_book(new_book: dict = Body()):
-
-# new_book is an argument meant to come from the request body
-
-# Here, the new book is being added to the global BOOKS list.
-    BOOKS.append(new_book) # This adds the new book to the list.
+async def create_book(new_book = Body()):
+    BOOKS.append(new_book)
     return {"message": "Book created", "book": new_book}
 
+
 # This decorator defines a PUT HTTP endpoint at path "path_param/update_book"
-@app.put("path_param/update_book")
-# An asynchronous function to handle the update book request
+
+# -----------------------------------------------------------------------
+# PUT method: Updates an existing book by matching the title and replacing it
+# -----------------------------------------------------------------------
+@app.put("/path_param/update_book")# This decorator defines a PUT HTTP endpoint at path "path_param/update_book"
 async def update_book(updated_book=Body()):
     # Loop through the list of BOOKS by index
     for i in range(len(BOOKS)):
@@ -102,3 +114,11 @@ async def update_book(updated_book=Body()):
         if BOOKS[i].get('title').casefold()==updated_book.get('title').casefold():
              # Replace the matched book with the updated book data
             BOOKS[i]=updated_book
+
+@app.delete("/path_param/delete_book/{book_title}")
+async def delete_book(book_title:str):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].get('title').casefold() == book_title.casefold():
+            BOOKS.pop(i)
+            break
+
