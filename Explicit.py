@@ -28,7 +28,7 @@ class BookRequest(BaseModel):
     author:str =Field(min_length=1)
     description:str = Field(min_length=1, max_length=100)
     rating:int =Field(gt=0,lt=6)
-    published_date:int =Field(gt=1999, lt=2030)
+    published_date: int =Field(gt=1999, lt=2030)
     
     model_config={
         "json_schema_extra": {
@@ -83,13 +83,14 @@ async def read_book_by_publish_date(published_date:int):
 async def create_book(book_request:BookRequest):
     new_book=Book(**book_request.model_dump())
     BOOKS.append(find_book_id(new_book))
+    return new_book
 
 def find_book_id(book:Book):
     if len(BOOKS)>0:
         book.id=BOOKS[-1].id+1
     else:
         book.id=1
-    #book.id=1 if len[BOOKS]==0 else BOOKS[-1].id+1
+   
     return book
 
 
@@ -100,7 +101,7 @@ async def update_book(book:BookRequest):
             BOOKS[i]= book
        
 
-@app.delete("/books/{book-id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/books/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id:int):
     for i in range(len(BOOKS)):
         if BOOKS[i].id==book_id:

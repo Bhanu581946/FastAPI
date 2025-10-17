@@ -81,14 +81,19 @@ async def read_book_by_publish_date(published_date:int):
 @app.post("/create-book")
 async def create_book(book_request:BookRequest):
     new_book=Book(**book_request.model_dump())
+    print(new_book) # <assignment.Book object at 0x000001819DEC67E0>
     BOOKS.append(find_book_id(new_book))
 
 def find_book_id(book:Book):
+    print('inside find book function after create call')
+    print('book=',book)
     if len(BOOKS)>0:
+        print('book id=',book.id)
         book.id=BOOKS[-1].id+1
+        print('after assigning=',book.id)
+        print('BOOKS[-1].id+1=',BOOKS[-1].id+1)
     else:
         book.id=1
-    #book.id=1 if len[BOOKS]==0 else BOOKS[-1].id+1
     return book
 
 
@@ -103,7 +108,8 @@ async def update_book(book:BookRequest):
 async def delete_book(book_id:int):
     for i in range(len(BOOKS)):
         if BOOKS[i].id==book_id:
-            BOOKS.pop(i)
+            x=BOOKS.pop(i)
+            print('x=',x.id)
             break           
 
 #http://127.0.0.1:8000/docs#/default/read_all_books_books_get

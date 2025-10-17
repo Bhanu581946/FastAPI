@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 app=FastAPI()
 
@@ -9,13 +9,15 @@ class Book():
     author: str
     description: str
     rating: int
+    published_date: int
 
-    def __init__(self,id,title,author,description,rating):
+    def __init__(self,id,title,author,description,rating, published_date):
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.rating = rating
+        self.published_date= published_date
 
 
 class BookRequest(BaseModel):
@@ -25,6 +27,7 @@ class BookRequest(BaseModel):
     author:str =Field(min_length=1)
     description:str = Field(min_length=1, max_length=100)
     rating:int =Field(gt=0,lt=6)
+    published_date:int =Field(gt=1999, lt=2031)
     
     model_config={
         "json_schema_extra": {
@@ -32,26 +35,26 @@ class BookRequest(BaseModel):
                 "title":"A new book",
                 "author":"ABC",
                 "description":"good book",
-                "rating":1
+                "rating":1,
+                "published_date":2030
             }
         }
     }
 
 BOOKS=[
-    Book(1,'Computer Science Pro','Coding', 'A Very nice book', 5),
-    Book(2,'Machine Learning Basics', 'AI', 'Great foundation for beginners', 4),
-    Book(3,'Python in Depth', 'Programming', 'Covers advanced Python concepts', 5),
-    Book(4,'Django for APIs', 'Web Development', 'Practical API building guide', 2),
-    Book(5,'Clean Code', 'Software Engineering', 'Principles of coding style', 3),
-    Book(6,'Fluent Python', 'Programming', 'Best practices', 2)
+    Book(1,'Computer Science Pro','Coding', 'A Very nice book', 5,2029),
+    Book(2,'Machine Learning Basics', 'AI', 'Great foundation for beginners', 4, 2028),
+    Book(3,'Python in Depth', 'Programming', 'Covers advanced Python concepts', 5, 2027),
+    Book(4,'Django for APIs', 'Web Development', 'Practical API building guide', 2, 2026),
+    Book(5,'Clean Code', 'Software Engineering', 'Principles of coding style', 3, 2029),
+    Book(6,'Fluent Python', 'Programming', 'Best practices', 2, 2030)
 ]
-
 @app.get("/books")
 async def read_all_books():
     return BOOKS
 
 @app.get("/books/{book_id}")
-async def read_book(book_id: int):
+async def read_book(book_id: int= Path(gt=0)):
     for book in BOOKS:
         if book.id== book_id:
             return book
