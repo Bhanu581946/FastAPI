@@ -1,0 +1,253 @@
+Type of Relationships in SQL:-
+1). Many-to-one:
+
+mysql> CREATE DATABASE school;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> USE school;
+Database changed
+mysql> CREATE TABLE Teachers (
+    ->     teacher_id INT PRIMARY KEY,
+    ->     first_name VARCHAR(255),
+    ->     last_name VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Courses (
+    ->     course_id INT PRIMARY KEY,
+    ->     course_name VARCHAR(255),
+    ->     teacher_id INT,
+    ->     FOREIGN KEY (teacher_id) REFERENCES Teachers(teacher_id)
+    -> );
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> SHOW TABLES;
++------------------+
+| Tables_in_school |
++------------------+
+| courses          |
+| teachers         |
++------------------+
+mysql> insert into teachers(teacher_id, first_name, last_name)values(1, 'Aman', 'Sandhu');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select *from teachers;
++------------+------------+-----------+
+| teacher_id | first_name | last_name |
++------------+------------+-----------+
+|          1 | Aman       | Sandhu    |
++------------+------------+-----------+
+1 row in set (0.00 sec)
+
+mysql> insert into teachers(teacher_id, first_name, last_name)values(2, 'Raman', 'Sharma');
+Query OK, 1 row affected (0.00 sec)
+mysql> insert into teachers(teacher_id, first_name, last_name)values(3, 'Kajal', 'Verma');
+Query OK, 1 row affected (0.00 sec)
+mysql> insert into teachers(teacher_id, first_name, last_name)values(3, 'Kajal', 'Verma');
+Query OK, 1 row affected (0.00 sec)
+mysql> insert into teachers(teacher_id, first_name, last_name)values(4, 'Rahul', 'Sharma');
+Query OK, 1 row affected (0.00 sec)
+mysql> insert into teachers(teacher_id, first_name, last_name)values(5, 'Ram', 'Singh');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select *from teachers;
++------------+------------+-----------+
+| teacher_id | first_name | last_name |
++------------+------------+-----------+
+|          1 | Aman       | Sandhu    |
+|          2 | Raman      | Sharma    |
+|          3 | Kajal      | Verma     |
+|          4 | Rahul      | Sharma    |
+|          5 | Ram        | Singh     |
++------------+------------+-----------+
+5 rows in set (0.00 sec)
+
+# You can use the following command to view all the tables present in your database.
+mysql> SHOW TABLES;
++------------------+
+| Tables_in_school |
++------------------+
+| author_book      |
+| authors          |
+| books            |
+| cand             |
+| courses          |
+| employee         |
+| student_courses  |
+| students         |
+| teachers         |
+| user_profile     |
+| users            |
++------------------+
+11 rows in set (0.02 sec)
+
+# If you choose one, then use the following command:
+
+mysql> describe users;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| user_id  | int         | NO   | PRI | NULL    |       |
+| username | varchar(50) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+# To view all rows:
+mysql> SELECT * FROM users;
++---------+----------+
+| user_id | username |
++---------+----------+
+|       1 | alice    |
+|       2 | bob      |
+|       3 | charlie  |
+|       4 | diana    |
+|       5 | eric     |
++---------+----------+
+5 rows in set (0.00 sec)
+2 rows in set (0.01 sec)
+
+#      JOINS
+
+# 1). Inner Join:
+
+mysql> CREATE TABLE STUDENT(
+    -> Rollno INT NOT NULL,
+    -> Name VARCHAR(100));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO STUDENT(Rollno, Name) VALUES(1, 'Harsh');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO STUDENT(Rollno, Name) VALUES(2, 'Pratik');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO STUDENT(Rollno, Name) VALUES(3, 'Riyanka');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM STUDENT;
++--------+---------+
+| Rollno | Name    |
++--------+---------+
+|      1 | Harsh   |
+|      2 | Pratik  |
+|      3 | Riyanka |
++--------+---------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE TABLE studentcourse(
+    -> Courseid INT NOT NULL,
+    -> Rollno INT );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> INSERT INTO StudentCourse(Courseid, Rollno) VALUES(1,1);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO StudentCourse(Courseid, Rollno) VALUES(2, 2);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO StudentCourse(Courseid, Rollno) VALUES(2, 3);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM StudentCourse;
++----------+--------+
+| Courseid | Rollno |
++----------+--------+
+|        1 |      1 |
+|        2 |      2 |
+|        2 |      3 |
++----------+--------+
+
+mysql> SELECT studentcourse.courseid, STUDENT.Name from STUDENT INNER JOIN studentcourse on  STUDENT.Rollno = StudentCourse.Rollno;
++----------+---------+
+| courseid | Name    |
++----------+---------+
+|        1 | Harsh   |
+|        2 | Pratik  |
+|        2 | Riyanka |
++----------+---------+
+3 rows in set (0.00 sec)
+
+# 2). Left (Outer) Join
+
+mysql> SELECT STUDENT.Rollno, STUDENT.Name, studentcourse.Courseid
+    -> FROM STUDENT
+    -> LEFT JOIN studentcourse ON STUDENT.Rollno = studentcourse.Rollno;
++--------+---------+----------+
+| Rollno | Name    | Courseid |
++--------+---------+----------+
+|      1 | Harsh   |        1 |
+|      2 | Pratik  |        2 |
+|      3 | Riyanka |        2 |
++--------+---------+----------+
+
+# 3). Right (Outer) Join
+
+
+mysql> SELECT STUDENT.Rollno, STUDENT.Name, studentcourse.Courseid
+    -> FROM STUDENT
+    -> RIGHT JOIN studentcourse ON STUDENT.Rollno = studentcourse.Rollno;
++--------+---------+----------+
+| Rollno | Name    | Courseid |
++--------+---------+----------+
+|      1 | Harsh   |        1 |
+|      2 | Pratik  |        2 |
+|      3 | Riyanka |        2 |
++--------+---------+----------+
+
+# 4). Full (Outer) Join
+
+
+mysql> SELECT STUDENT.Rollno, STUDENT.Name, studentcourse.Courseid
+    -> FROM STUDENT
+    -> LEFT JOIN studentcourse ON STUDENT.Rollno = studentcourse.Rollno
+    ->
+    -> UNION
+    ->
+    -> SELECT STUDENT.Rollno, STUDENT.Name, studentcourse.Courseid
+    -> FROM STUDENT
+    -> RIGHT JOIN studentcourse ON STUDENT.Rollno = studentcourse.Rollno;
++--------+---------+----------+
+| Rollno | Name    | Courseid |
++--------+---------+----------+
+|      1 | Harsh   |        1 |
+|      2 | Pratik  |        2 |
+|      3 | Riyanka |        2 |
++--------+---------+----------+
+
+# 5). Cross Join
+
+mysql> SELECT STUDENT.Name, studentcourse.Courseid
+    -> FROM STUDENT
+    -> CROSS JOIN studentcourse;
++---------+----------+
+| Name    | Courseid |
++---------+----------+
+| Riyanka |        1 |
+| Pratik  |        1 |
+| Harsh   |        1 |
+| Riyanka |        2 |
+| Pratik  |        2 |
+| Harsh   |        2 |
+| Riyanka |        2 |
+| Pratik  |        2 |
+| Harsh   |        2 |
++---------+----------+
+ # Select maximum courseid
+mysql> SELECT MAX(Courseid) AS HIGHEST_Courseid FROM studentcourse;
++------------------+
+| HIGHEST_Courseid |
++------------------+
+|                2 |
++------------------+
+
+OR
+
+mysql> SELECT MAX(Courseid) AS `HIGHEST Courseid` FROM studentcourse;
++------------------+
+| HIGHEST Courseid |
++------------------+
+|                2 |
++------------------+
+
+
+ 
