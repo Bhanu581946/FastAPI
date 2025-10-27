@@ -1,0 +1,58 @@
+Table Creation
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(50),
+    CourseID VARCHAR(10),
+    CourseName VARCHAR(50)
+);
+
+2. Insert Some Existing Records
+INSERT INTO Student (StudentID, StudentName, CourseID, CourseName)
+VALUES
+(101, 'Riya', 'C1', 'BCA'),
+(102, 'Amit', 'C2', 'MCA'),
+(103, 'Sonia', 'C3', 'BBA');
+
+3. Try to Insert the New Course "MBA"
+
+Now college wants to add a new course MBA (C4) but no student yet.
+
+INSERT INTO Student (StudentID, StudentName, CourseID, CourseName)
+VALUES (NULL, NULL, 'C4', 'MBA');
+
+
+🚫 Error:
+
+ERROR 1048 (23000): Column 'StudentID' cannot be null
+
+
+✅ Explanation:
+Because StudentID is the Primary Key, it cannot be NULL.
+So, you cannot insert a course record unless a student exists → this is an Insertion Anomaly.
+
+4. Proper Solution (Normalization)
+
+We should split the table into two separate ones to remove this anomaly:
+
+a) Course Table
+CREATE TABLE Course (
+    CourseID VARCHAR(10) PRIMARY KEY,
+    CourseName VARCHAR(50)
+);
+
+b) Student Table
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(50),
+    CourseID VARCHAR(10),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
+
+5. Now You Can Insert Course Without Student
+INSERT INTO Course (CourseID, CourseName)
+VALUES ('C4', 'MBA');
+
+
+✅ Successfully inserted — no anomaly now.
+
+Summary:
