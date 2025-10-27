@@ -1,3 +1,7 @@
+AnomalIes In relatIonal database:-
+
+1). Insertion Anomaly:-  Add new information in any relation but cannot enter that data 
+because of some constraints. 
 Table Creation
 CREATE TABLE Student (
     StudentID INT PRIMARY KEY,
@@ -55,4 +59,139 @@ VALUES ('C4', 'MBA');
 
 ✅ Successfully inserted — no anomaly now.
 
-Summary:
+2). Deletion Anomaly (Data delete karne me problem)
+Use Case: Employee–Department Database
+Table: Employee
+EID	Name	Dept.No	Dept.Name
+1	Riya Sharma	10	Accounts
+2	Deepak Gupta	20	Sales
+3	Amit Verma	10	Accounts
+4	Sanya Kapoor	30	Marketing
+🧾 Situation:
+
+In this company, every employee’s department name is stored in the same table.
+
+Now imagine you need to delete Deepak Gupta because he has left the company.
+
+So, you execute this SQL query:
+
+DELETE FROM Employee WHERE EID = 2;
+
+❌ Problem (Deletion Anomaly):
+
+When you delete “Deepak Gupta,” the Sales department’s data also gets deleted 😬
+because there was no other employee working in the Sales department.
+
+Now the database has lost all information about the Sales department!
+There is no record left that represents “Sales” anymore.
+
+🧠 Simple Explanation:
+
+“While deleting one employee, the entire department was deleted — because that employee was the only one in that department.”
+
+⚙️ Real-world Effect:
+
+The company’s reports will no longer show the “Sales” department.
+
+If management wants to hire a new employee for the Sales department,
+the system will respond, “Sales department does not exist.”
+
+This means the database has become inconsistent and incomplete.
+
+✅ Solution (Normalization):
+
+To avoid this issue, the data should be normalized,
+which means separating Employee and Department into two different tables.
+
+Table: Department
+Dept.No	Dept.Name
+10	Accounts
+20	Sales
+30	Marketing
+Table: Employee
+EID	Name	Dept.No
+1	Riya Sharma	10
+2	Deepak Gupta	20
+3	Amit Verma	10
+4	Sanya Kapoor	30
+
+Now, if you delete Deepak Gupta 👇
+
+DELETE FROM Employee WHERE EID = 2;
+
+
+only the employee record will be deleted,
+and the Sales department information remains safe ✅
+
+3).  Updation Anomaly:- Try to update any existing information in any 
+relation and this causes inconsistency of data. 
+Use Case: Employee–Department Database
+Table: Employee
+EID	Name	Dept.No	Dept.Name
+1	Riya Sharma	10	Accounts
+2	Amit Verma	10	Accounts
+3	Deepak Gupta	20	Sales
+4	Sanya Kapoor	30	Marketing
+🧾 Situation:
+
+The company decides to change the department number of the Accounts department from 10 to 11.
+
+This means every employee who works in the Accounts department should have their Dept.No updated to 11.
+
+🧑‍💻 What happens (Human Error Example):
+
+Suppose you only update one record and forget to update the others:
+
+UPDATE Employee SET Dept.No = 11 WHERE EID = 1;
+
+
+Now your table looks like this 👇
+
+EID	Name	Dept.No	Dept.Name
+1	Riya Sharma	11	Accounts
+2	Amit Verma	10	Accounts
+3	Deepak Gupta	20	Sales
+4	Sanya Kapoor	30	Marketing
+❌ Problem (Updation Anomaly):
+
+Now the same department (Accounts) has two different department numbers — 10 and 11.
+
+This creates inconsistency in data, because the database no longer knows the correct Dept.No for the Accounts department.
+
+🧠 Simple Explanation:
+
+“When updating the department number for one employee, you forgot to update it for others — so the data became inconsistent.”
+
+⚙️ Real-world Effect:
+
+Reports may show two different Dept.No values for the same department.
+
+When someone searches for employees in department 11, they’ll only find some of the Accounts employees.
+
+Any new employee added to the Accounts department might get assigned the wrong number (10 instead of 11).
+
+This leads to confusion, mismatched data, and reporting errors.
+
+✅ Solution (Normalization):
+
+To prevent this anomaly, separate department information into a Department table and reference it from the Employee table.
+
+Table: Department
+Dept.No	Dept.Name
+11	Accounts
+20	Sales
+30	Marketing
+Table: Employee
+EID	Name	Dept.No
+1	Riya Sharma	11
+2	Amit Verma	11
+3	Deepak Gupta	20
+4	Sanya Kapoor	30
+
+Now, if you want to change the department number for “Accounts,”
+you only need to update one record in the Department table 👇
+
+UPDATE Department SET Dept.No = 12 WHERE Dept.Name = 'Accounts';
+
+
+✅ The Employee table remains consistent automatically through the foreign key relationship.
