@@ -1,0 +1,268 @@
+Normalisation is a process by which we can decompose or divide any relation into more 
+than one relation to remove anomalies in relational database.
+ It is a step by step process and each step is known as Normal Form.
+ Normalisation is a reversible process.
+
+Various Normal Forms:-
+1). First Normal Form (1NF):-
+If all the attribute values in a relation (table) are atomic (single-valued), then the table is said to be in First Normal Form (1NF).
+This means that each column must contain only one value, not repeated or composite values.
+
+Example (Employee Table):
+
+EID	Name	Salary	Dept.No	Dept.Name
+1	Shivi Goyal	10,000	2	Accounts
+2	Amit Chopra	9,000	1	Sales
+
+Problem:
+Here, the Name column is not atomic, because it contains both First Name and Last Name combined.
+
+ Solution (After applying 1NF):
+
+EID	FirstName	LastName	Salary	Dept.No	Dept.Name
+1	Shivi	Goyal	10,000	2	Accounts
+2	Amit	Chopra	9,000	1	Sales
+
+Now all attributes are atomic, so the table is in 1NF.
+
+Anomalies still present in 1NF:
+
+Repetition Problem:
+Dept.Name is repeated for every employee in the same department.
+
+Update Problem:
+If the name of the “Accounts” department changes, you must update it in every related record.
+
+Insertion Problem:
+You cannot add a new department if it has no employees yet, because employee data is required to insert a record.
+
+Deletion Problem:
+If the last employee of a department is deleted, the department information will also be lost.
+
+2).  Second Normal Form (2NF):-
+A relation (table) is in Second Normal Form (2NF) when:
+
+It is already in First Normal Form (1NF), and
+
+All non–primary key attributes are fully dependent on the entire primary key, not just a part of it.
+
+In other words,
+If the primary key is composite (made up of two or more columns),
+then no column should depend on only a part of that key.
+
+Example: Student Table
+
+RollNo	Game	Name	Fee	Grade
+1	Cricket	Amit	200	A
+2	Badminton	Dheeraj	150	B
+3	Cricket	Lalit	200	A
+4	Badminton	Parul	150	C
+5	Hockey	Jack	100	A
+6	Cricket	John	200	C
+
+Primary Key: (RollNo, Game)
+Because a student (RollNo) can participate in multiple games.
+
+Problems (Anomalies) in 1NF Table
+
+1. Deletion Anomaly:
+If “Jack” (who plays Hockey) is deleted,
+then the information about the game “Hockey” will also be lost.
+
+2. Insertion Anomaly:
+If we want to add a new game “Basketball” with no players yet,
+we cannot insert it because there is no RollNo.
+
+3. Update Anomaly:
+If the fee for “Cricket” changes,
+we have to update every row where “Cricket” appears.
+If one row is missed, the data becomes inconsistent.
+
+Reason (Dependency Problem)
+
+Dependency	Meaning
+RollNo → Name	Student name depends only on RollNo
+Game → Fee	Game fee depends only on Game
+(RollNo, Game) → Grade	Grade depends on both RollNo and Game
+
+This means some columns are partially dependent on only one part of the composite key.
+That’s why the table is not in 2NF.
+
+Solution (Convert to 2NF)
+
+We split the table into three smaller tables:
+
+1. Student Table
+
+RollNo	Name
+1	Amit
+2	Dheeraj
+3	Lalit
+4	Parul
+5	Jack
+6	John
+
+Dependency: RollNo → Name
+
+2. Games Table
+
+Game	Fee
+Cricket	200
+Badminton	150
+Hockey	100
+
+Dependency: Game → Fee
+
+3. Performance Table
+
+RollNo	Game	Grade
+1	Cricket	A
+2	Badminton	B
+3	Cricket	A
+4	Badminton	C
+5	Hockey	A
+6	Cricket	C
+
+Dependency: (RollNo, Game) → Grade
+
+Now the tables are in 2NF!
+
+All non-key attributes fully depend on their primary keys.
+Partial dependency is removed.
+There are no more Deletion, Insertion, or Update anomalies.
+SQL:-
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| newbie             |
+| performance_schema |
+| school             |
+| shop               |
+| sys                |
++--------------------+
+7 rows in set (0.01 sec)
+
+mysql> USE student_db;
+ERROR 1049 (42000): Unknown database 'student_db'
+mysql> USE sys;
+Database changed
+mysql> CREATE TABLE Student (
+    ->   RollNo INT PRIMARY KEY,
+    ->   Name VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql>
+mysql> INSERT INTO Student (RollNo, Name) VALUES
+    -> (1, 'Amit'),
+    -> (2, 'Dheeraj'),
+    -> (3, 'Lalit'),
+    -> (4, 'Parul'),
+    -> (5, 'Jack'),
+    -> (6, 'John');
+Query OK, 6 rows affected (0.01 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> select * from Student;
++--------+---------+
+| RollNo | Name    |
++--------+---------+
+|      1 | Amit    |
+|      2 | Dheeraj |
+|      3 | Lalit   |
+|      4 | Parul   |
+|      5 | Jack    |
+|      6 | John    |
++--------+---------+
+6 rows in set (0.00 sec)
+
+mysql> CREATE TABLE Games (
+    ->   Game VARCHAR(50) PRIMARY KEY,
+    ->   Fee INT
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql>
+mysql> INSERT INTO Games (Game, Fee) VALUES
+    -> ('Cricket', 200),
+    -> ('Badminton', 150),
+    -> ('Hockey', 100);
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from Games;
++-----------+------+
+| Game      | Fee  |
++-----------+------+
+| Badminton |  150 |
+| Cricket   |  200 |
+| Hockey    |  100 |
++-----------+------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE TABLE Performance (
+    RollNo INT,
+    Game VARCHAR(50),
+    Grade CHAR(1),
+    PRIMARY KEY (RollNo, Game),
+    FOREIGN KEY (RollNo) REFERENCES Student(RollNo),
+    FOREIGN KEY (Game) REFERENCES Games(Game)
+    );
+Query OK, 0 rows affected (0.07 sec)
+
+mysql>
+mysql> INSERT INTO Performance (RollNo, Game, Grade) VALUES
+    (1, 'Cricket', 'A'),
+    (2, 'Badminton', 'B'),
+    (3, 'Cricket', 'A'),
+    (4, 'Badminton', 'C'),
+    (5, 'Hockey', 'A'),
+    (6, 'Cricket', 'C');
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Performance;
++--------+-----------+-------+
+| RollNo | Game      | Grade |
++--------+-----------+-------+
+|      1 | Cricket   | A     |
+|      2 | Badminton | B     |
+|      3 | Cricket   | A     |
+|      4 | Badminton | C     |
+|      5 | Hockey    | A     |
+|      6 | Cricket   | C     |
++--------+-----------+-------+
+6 rows in set (0.00 sec)
+mysql> DELETE FROM Student WHERE RollNo = 5;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`sys`.`performance`, CONSTRAINT `performance_ibfk_1` FOREIGN KEY (`RollNo`) REFERENCES `student` (`RollNo`))
+mysql> DELETE FROM Performance WHERE RollNo = 5;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> DELETE FROM Student WHERE RollNo = 5;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM Student;
++--------+---------+
+| RollNo | Name    |
++--------+---------+
+|      1 | Amit    |
+|      2 | Dheeraj |
+|      3 | Lalit   |
+|      4 | Parul   |
+|      6 | John    |
++--------+---------+
+5 rows in set (0.00 sec)
+
+mysql> INSERT INTO Games (Game, Fee) VALUES ('Basketball', 120);
+ SELECT * FROM Games;
++------------+------+
+| Game       | Fee  |
++------------+------+
+| Badminton  |  150 |
+| Basketball |  120 |
+| Cricket    |  200 |
+| Hockey     |  100 |
++------------+------+
