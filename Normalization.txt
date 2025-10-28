@@ -553,3 +553,132 @@ StudentID	Instructor
 3		Dr. Sharma
 
 Now: In both tables, left side of every dependency is a super key. Table is now in BCNF.
+
+4). What is 4NF?
+
+A table is in 4NF if it is in BCNF,and it has no multi-valued dependencies (MVDs).
+
+🔹 What is a multi-valued dependency?
+
+It happens when:One key attribute determines two or more independent sets of values.
+
+In other words:
+
+A single entity has multiple independent multi-valued facts stored in the same table.
+Step 3: Example (violates 4NF)
+Student	Hobby	Language
+Riya	Painting	English
+Riya	Painting	Hindi
+Riya	Singing	English
+Riya	Singing	Hindi
+Explanation:
+
+A student can have multiple hobbies
+A student can know multiple languages
+But hobby and language are independent of each other
+
+Functional dependencies:
+
+Student →→ Hobby
+
+Student →→ Language
+
+ Here →→ means multi-valued dependency (MVD)
+
+So there are two independent MVDs on the same key (Student).
+
+This table is in BCNF, but not in 4NF, because one key (Student) determines multiple independent sets of values (Hobby, Language).
+
+Step 4: Fix (Decomposition for 4NF)
+
+We split it into two tables 👇
+
+Table 1: Student_Hobby
+
+Student	Hobby
+Riya	Painting
+Riya	Singing
+
+Table 2: Student_Language
+
+Student	Language
+Riya	English
+Riya	Hindi
+
+Now both tables are in 4NF,
+because each table represents one independent multi-valued fact about the student.
+in short:- If one entity (like a student) has multiple independent sets of values (hobbies, languages),
+split them into separate tables — each for one independent relationship.
+
+5). 5NF:-
+A table is in Fifth Normal Form (5NF) if it is already in 4NF,
+and cannot be decomposed further into smaller tables without losing data or creating redundancy.
+
+A relation is in 5NF if every join dependency in it is implied by the candidate keys.
+
+Step 3: Intuitive Meaning
+
+👉 4NF removes multi-valued dependencies
+👉 5NF removes join dependencies
+
+Join Dependency = When information can be reconstructed by joining multiple smaller tables,
+but we still store it together unnecessarily.
+
+Basically:
+
+5NF ensures there is no redundant data that can be reconstructed by joining smaller relations.
+
+Step 4: Example (violates 5NF)
+Table: Supplier_Product_Project
+Supplier	Product	Project
+S1	P1	J1
+S1	P1	J2
+S1	P2	J1
+Meaning:
+
+Supplier S1 supplies P1 and P2.
+
+Supplier S1 supplies to projects J1 and J2.
+
+So we get all possible combinations like:
+
+(S1, P1, J1)
+
+(S1, P1, J2)
+
+(S1, P2, J1)
+
+Problem:
+
+There is redundancy here.
+The relationships between Supplier–Product, Supplier–Project, and Product–Project are independent,
+but we are storing their combinations repeatedly.
+
+This means the table can be decomposed further — hence, not in 5NF.
+
+Step 5: Convert to 5NF
+
+We break it into three smaller tables:
+
+Supplier_Product
+
+Supplier	Product
+S1	P1
+S1	P2
+
+Supplier_Project
+
+Supplier	Project
+S1	J1
+S1	J2
+
+Product_Project
+
+Product	Project
+P1	J1
+P1	J2
+P2	J1
+
+Now, when you join these three tables,
+you can reconstruct the original table without redundancy.
+Hence, this structure is in 5NF.
