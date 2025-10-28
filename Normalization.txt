@@ -1,14 +1,49 @@
+KEYS:-
+
+| **Concept**       | **Meaning**                                               | **Example**                   |
+| :---------------- | :-------------------------------------------------------- | :---------------------------- |
+| **Super Key**     | Any attribute(s) that can uniquely identify a record      | RollNo, Email, (RollNo, Name) |
+| **Candidate Key** | Minimal Super Key (no extra attribute)                    | RollNo, Email                 |
+| **Primary Key**   | One Candidate Key chosen officially                       | RollNo                        |
+| **Composite Key** | Multi-column Candidate Key (made of 2 or more attributes) | (StudentID, Subject)          |
+| **Alternate Key** | Remaining Candidate Keys after choosing Primary Key       | Email                         |
+
+Normalisation:-
 Normalisation is a process by which we can decompose or divide any relation into more 
 than one relation to remove anomalies in relational database.
- It is a step by step process and each step is known as Normal Form.
- Normalisation is a reversible process.
+It is a step by step process and each step is known as Normal Form.
+Normalisation is a reversible process.
 
 Various Normal Forms:-
+
+An SQL table can be created without being in 1NF,
+but the 1NF concept is meant for database design, not for execution.
+
+*SQL only creates tables — it does not check logical rules.At the MySQL or SQL syntax level, it only checks for things like:
+
+Column name, Data type, Primary key constraint. That’s it.
+
+It doesn’t check whether:
+
+A column contains multiple values, or
+
+There are repeated or multi-valued fields.
+
+That’s why SQL accepts data like "Maths, Science" as a single string and inserts it without any error.
+
+* But Normalization is a design concept
+
+Normalization (1NF, 2NF, 3NF, BCNF) is not applied inside SQL —
+it is applied during the database design stage.
+
+Its purpose is:
+“To design data in such a way that redundancy and anomalies are avoided.”
+
 1). First Normal Form (1NF):-
 If all the attribute values in a relation (table) are atomic (single-valued), then the table is said to be in First Normal Form (1NF).
 This means that each column must contain only one value, not repeated or composite values.
 
-Example (Employee Table):
+Example 1). (Employee Table):
 
 EID	Name	Salary	Dept.No	Dept.Name
 1	Shivi Goyal	10,000	2	Accounts
@@ -23,7 +58,24 @@ EID	FirstName	LastName	Salary	Dept.No	Dept.Name
 1	Shivi	Goyal	10,000	2	Accounts
 2	Amit	Chopra	9,000	1	Sales
 
+eg 2). Unnormalized Table (Not in 1NF)
+RollNo	Name	Subjects
+1	Riya Sharma	Maths, Science
+2	Deepak Gupta	English, Science
+Problem:
+The Subjects column has multiple values (Maths, Science, etc.) in a single cell — this violates 1NF rule.
 Now all attributes are atomic, so the table is in 1NF.
+After 1NF (First Normal Form)
+RollNo	Name	Subject
+1	Riya Sharma	Maths
+1	Riya Sharma	Science
+2	Deepak Gupta	English
+
+Explanation:
+
+Each cell now contains only one value.
+
+There are no repeating groups or arrays.
 
 Anomalies still present in 1NF:
 
@@ -52,13 +104,13 @@ then no column should depend on only a part of that key.
 
 Example: Student Table
 
-RollNo	Game	Name	Fee	Grade
-1	Cricket	Amit	200	A
-2	Badminton	Dheeraj	150	B
-3	Cricket	Lalit	200	A
-4	Badminton	Parul	150	C
-5	Hockey	Jack	100	A
-6	Cricket	John	200	C
+RollNo	Game		Name		Fee		Grade
+1	Cricket		Amit		200		A
+2	Badminton	Dheeraj		150		B
+3	Cricket		Lalit		200		A
+4	Badminton	Parul		150		C
+5	Hockey		Jack		100		A
+6	Cricket		John		200		C
 
 Primary Key: (RollNo, Game)
 Because a student (RollNo) can participate in multiple games.
@@ -106,22 +158,22 @@ Dependency: RollNo → Name
 
 2. Games Table
 
-Game	Fee
-Cricket	200
+Game		Fee
+Cricket		200
 Badminton	150
-Hockey	100
+Hockey		100
 
 Dependency: Game → Fee
 
 3. Performance Table
 
-RollNo	Game	Grade
-1	Cricket	A
+RollNo	Game		Grade
+1	Cricket		A
 2	Badminton	B
-3	Cricket	A
+3	Cricket		A
 4	Badminton	C
-5	Hockey	A
-6	Cricket	C
+5	Hockey		A
+6	Cricket		C
 
 Dependency: (RollNo, Game) → Grade
 
@@ -266,3 +318,238 @@ mysql> INSERT INTO Games (Game, Fee) VALUES ('Basketball', 120);
 | Cricket    |  200 |
 | Hockey     |  100 |
 +------------+------+
+
+join using INNER JOIN:-
+eg:
+mysql> CREATE TABLE Student (
+    ->   RollNo INT PRIMARY KEY,
+    ->   Name VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE Subject (
+    ->   SubjectID INT PRIMARY KEY,
+    ->   SubjectName VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Student_Subject (
+    ->   RollNo INT,
+    ->   SubjectID INT,
+    ->   FOREIGN KEY (RollNo) REFERENCES Student(RollNo),
+    ->   FOREIGN KEY (SubjectID) REFERENCES Subject(SubjectID)
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> INSERT INTO Student (RollNo, Name) VALUES
+    -> (1, 'Riya Sharma'),
+    -> (2, 'Aman Verma'),
+    -> (3, 'Sanya Kapoor');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Subject (SubjectID, SubjectName) VALUES
+    -> (101, 'Math'),
+    -> (102, 'Science'),
+    -> (103, 'English');
+ INSERT INTO Student_Subject (RollNo, SubjectID) VALUES
+    -> (1, 101),
+    -> (1, 103),
+    -> (2, 102),
+    -> (2, 103),
+    -> (3, 101);
+ SELECT
+    ->   s.RollNo,
+    ->   s.Name,
+    ->   sub.SubjectName
+    -> FROM
+    ->   Student s
+    ->   INNER JOIN Student_Subject ss ON s.RollNo = ss.RollNo
+    ->   INNER JOIN Subject sub ON ss.SubjectID = sub.SubjectID
+    -> ORDER BY s.RollNo;
++--------+--------------+-------------+
+| RollNo | Name         | SubjectName |
++--------+--------------+-------------+
+|      1 | Riya Sharma  | Math        |
+|      1 | Riya Sharma  | English     |
+|      2 | Aman Verma   | Science     |
+|      2 | Aman Verma   | English     |
+|      3 | Sanya Kapoor | Math        |
++--------+--------------+-------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->   s.RollNo,
+    ->   s.Name,
+    ->   ss.SubjectID,
+    ->   sub.SubjectName
+    -> FROM
+    ->   Student s
+    ->   INNER JOIN Student_Subject ss ON s.RollNo = ss.RollNo
+    ->   INNER JOIN Subject sub ON ss.SubjectID = sub.SubjectID
+    -> ORDER BY s.RollNo;
++--------+--------------+-----------+-------------+
+| RollNo | Name         | SubjectID | SubjectName |
++--------+--------------+-----------+-------------+
+|      1 | Riya Sharma  |       101 | Math        |
+|      1 | Riya Sharma  |       103 | English     |
+|      2 | Aman Verma   |       102 | Science     |
+|      2 | Aman Verma   |       103 | English     |
+|      3 | Sanya Kapoor |       101 | Math        |
++--------+--------------+-----------+-------------+
+
+Alias	Refers to		Example usage
+s	Student table		s.RollNo, s.Name
+ss	Student_Subject table	ss.RollNo, ss.SubjectID
+sub	Subject table		sub.SubjectName
+
+INNER JOIN Student_Subject ss ON s.RollNo = ss.RollNo
+→ Connect each student with their corresponding entries in the junction table.
+
+INNER JOIN Subject sub ON ss.SubjectID = sub.SubjectID
+→ Then connect that subject ID to get the actual subject name.
+or Match each student (s.RollNo) with rows in Student_Subject having the same roll number.
+Then, for those rows, match ss.SubjectID to Subject.SubjectID to find the subject name.
+
+Mainpoints:-
+Step	Action	Result
+1	Start from Student		List of students
+2	Join with Student_Subject	Find which subjects each student has
+3	Join with Subject		Get actual subject names
+4	Order by RollNo		Sort final output neatly
+
+Third Normal Form (3NF):- A relation (table) is in Third Normal Form (3NF) when:
+
+It is already in Second Normal Form (2NF), and
+Every non–primary key attribute is not transitively dependent on the primary key.
+
+In short:
+There should be no transitive dependency.
+
+🧩 What is Transitive Dependency?
+
+A transitive dependency means that a non-key attribute depends on the primary key through another non-key attribute.
+
+🧠 Example:
+
+RollNo → Semester  
+Semester → Hostel  
+Therefore, RollNo → Hostel (transitively)
+
+
+This means that Hostel does not depend directly on RollNo,
+but indirectly through Semester — this is a transitive dependency.
+
+📊 Example Table (Before 3NF)
+
+Table: Student
+
+RollNo	Name	Semester	Hostel
+1	Lalit	1		H1
+2	Gaurav	2		H2
+3	Vishal	1		H1
+4	Neha	4		H4
+5	John	3		H3
+
+Primary Key: RollNo
+
+Dependencies:
+
+RollNo → Name
+
+RollNo → Semester
+
+Semester → Hostel ❌ (transitive dependency)
+
+⚠️ Problems (Anomalies) in 2NF Table
+
+🔸 1. Deletion Anomaly:
+If we delete “Gaurav” (RollNo 2, Hostel H2),
+the information about Hostel H2 is also lost,
+because no other student is in that hostel.
+
+🔸 2. Insertion Anomaly:
+If we want to add a new hostel “H8” that currently has no students,
+we cannot insert it since there’s no RollNo.
+
+3. Update Anomaly:
+If the hostel for Semester 1 changes,
+we need to update every student in Semester 1 manually.
+If even one row is missed, the data becomes inconsistent.
+
+Solution (Convert to 3NF)
+
+To remove the transitive dependency (Semester → Hostel),
+we split the table into two smaller tables:
+
+1. Student Table
+
+RollNo	Name	Semester
+1	Lalit	1
+2	Gaurav	2
+3	Vishal	1
+4	Neha	4
+5	John	3
+
+Dependency: RollNo → Name, Semester
+
+2. Semester Table
+
+Semester	Hostel
+1	        H1
+2	        H2
+3	        H3
+4	        H4
+
+Dependency: Semester → Hostel
+Now the Database is in 3NF!
+All non-key attributes depend only on the primary key.Transitive dependency is removed.
+No Insertion, Deletion, or Update anomalies exist.
+
+4.) Boyce Codd Normal Form (BCNF)
+A table is in BCNF (Boyce–Codd Normal Form) if:
+
+For every functional dependency (X → Y),
+X must be a super key.
+
+🔹 In simple words:
+
+BCNF = Stronger version of 3NF
+
+It fixes cases where 3NF allows dependency between candidate keys.
+
+🧾 Step 3: Example (3NF but not BCNF)
+StudentID	Course		Instructor
+1		DBMS		Dr. Verma
+2		DBMS		Dr. Verma
+3		OS		Dr. Sharma
+⚙️ Functional Dependencies:
+
+(StudentID, Course) → Instructor ✅
+
+Instructor → Course ❌ (Problem)
+
+🔍 Why it’s a problem:
+
+Primary key = (StudentID, Course)
+
+But “Instructor” also determines “Course”.
+
+Instructor is not a super key, but still determines another attribute.
+❌ So this table violates BCNF (but it’s okay in 3NF).
+
+✅ Step 4: Convert to BCNF
+
+We decompose the table into two:
+
+Table 1: InstructorCourse
+Instructor	Course
+Dr. Verma	DBMS
+Dr. Sharma	OS
+Table 2: StudentInstructor
+StudentID	Instructor
+1		Dr. Verma
+2		Dr. Verma
+3		Dr. Sharma
+
+Now: In both tables, left side of every dependency is a super key. Table is now in BCNF.
