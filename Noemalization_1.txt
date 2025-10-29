@@ -1,0 +1,750 @@
+Normalization:-
+Normalization is a process by which we can decompose or divide any relation into more 
+than one relation to remove anomalies in relational database.
+It is a step by step process and each step is known as Normal Form.
+Normalization is a reversible process.
+
+Various Normal Forms:-Normalization (1NF, 2NF, 3NF, BCNF) is not applied inside SQL —
+it is applied during the database design stage.
+
+Its purpose is:
+“To design data in such a way that redundancy and anomalies are avoided.”
+
+1NF:- If all the attribute values in a relation (table) are atomic (single-valued), 
+then the table is said to be in First Normal Form (1NF).
+This means that each column must contain only one value, not repeated or composite values.
+use 1nf;
+Database changed
+Before 1nf:
+mysql> CREATE TABLE Student (
+    ->   RollNo INT,
+    ->   Name VARCHAR(100),
+    ->   Subjects VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> INSERT INTO Student VALUES
+    -> (1, 'Amit', 'Math, English, Science'),
+    -> (2, 'Dheeraj', 'English, History'),
+    -> (3, 'Parul', 'Math, Hindi');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Student;
++--------+---------+------------------------+
+| RollNo | Name    | Subjects               |
++--------+---------+------------------------+
+|      1 | Amit    | Math, English, Science |
+|      2 | Dheeraj | English, History       |
+|      3 | Parul   | Math, Hindi            |
++--------+---------+------------------------+
+3 rows in set (0.00 sec)
+
+After 1nf:
+mysql> CREATE TABLE Student1 (
+    ->   RollNo INT,
+    ->   Name VARCHAR(100),
+    ->   Subject VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO Student1 VALUES
+    -> (1, 'Amit', 'Math'),
+    -> (1, 'Amit', 'English'),
+    -> (1, 'Amit', 'Science'),
+    -> (2, 'Dheeraj', 'English'),
+    -> (2, 'Dheeraj', 'History'),
+    -> (3, 'Parul', 'Math'),
+    -> (3, 'Parul', 'Hindi');
+Query OK, 7 rows affected (0.01 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Student1;
++--------+---------+---------+
+| RollNo | Name    | Subject |
++--------+---------+---------+
+|      1 | Amit    | Math    |
+|      1 | Amit    | English |
+|      1 | Amit    | Science |
+|      2 | Dheeraj | English |
+|      2 | Dheeraj | History |
+|      3 | Parul   | Math    |
+|      3 | Parul   | Hindi   |
++--------+---------+---------+
+************************************************************
+
+2NF:-
+2NF (Second Normal Form)
+Rule:A table is in Second Normal Form (2NF) if:
+It is already in 1NF ✅
+There are no partial dependencies — meaning no non-key attribute depends only on a part of a composite key.
+ use 2nf;
+Database changed
+
+Before 2nf:
+mysql> CREATE TABLE StudentSubject_1NF (
+    ->   RollNo INT,
+    ->   Name VARCHAR(100),
+    ->   SubjectID INT,
+    ->   SubjectName VARCHAR(100),
+    ->   Fee INT,
+    ->   Grade VARCHAR(5),
+    ->   PRIMARY KEY (RollNo, SubjectID)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO StudentSubject_1NF VALUES
+    -> (1, 'Amit', 101, 'Maths', 200, 'A'),
+    -> (1, 'Amit', 102, 'English', 200, 'B'),
+    -> (2, 'Dheeraj', 101, 'Maths', 150, 'A'),
+    -> (2, 'Dheeraj', 103, 'Science', 150, 'B');
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM StudentSubject_1NF;
++--------+---------+-----------+-------------+------+-------+
+| RollNo | Name    | SubjectID | SubjectName | Fee  | Grade |
++--------+---------+-----------+-------------+------+-------+
+|      1 | Amit    |       101 | Maths       |  200 | A     |
+|      1 | Amit    |       102 | English     |  200 | B     |
+|      2 | Dheeraj |       101 | Maths       |  150 | A     |
+|      2 | Dheeraj |       103 | Science     |  150 | B     |
++--------+---------+-----------+-------------+------+-------+
+ 1NF Table (Before Normalization)
+
+Composite key: (RollNo, SubjectID)
+Problem: Name depends only on RollNo (part of the key).
+SubjectName depends only on SubjectID.
+→ This is a partial dependency, so it violates 2NF.
+Convert to 2NF (Remove Partial Dependency)
+
+We split into 3 tables:
+
+1. Student → details depending on RollNo
+2️. Subject → details depending on SubjectID
+3️. Student_Subject → mapping between Student and Subject (composite key)
+
+1st. Student Table
+| RollNo | Name    | Fee |
+| -----: | ------- | --- |
+|      1 | Amit    | 200 |
+|      2 | Dheeraj | 150 |
+
+CREATE TABLE Student (
+  RollNo INT PRIMARY KEY,
+  Name VARCHAR(100),
+  Fee INT
+);
+
+INSERT INTO Student VALUES
+(1, 'Amit', 200),
+(2, 'Dheeraj', 150);
+
+2nd. Subject Table
+SubjectID	SubjectName
+101		Maths
+102		English
+103		Science
+
+CREATE TABLE Subject (
+  SubjectID INT PRIMARY KEY,
+  SubjectName VARCHAR(100)
+);
+
+INSERT INTO Subject VALUES
+(101, 'Maths'),
+(102, 'English'),
+(103, 'Science');
+
+3rd. Student_Subject (Junction Table)
+RollNo	SubjectID	Grade
+1	101		A
+1	102		B
+2	101		A
+2	103		B
+
+CREATE TABLE Student_Subject (
+  RollNo INT,
+  SubjectID INT,
+  Grade VARCHAR(10),
+  PRIMARY KEY (RollNo, SubjectID),
+  FOREIGN KEY (RollNo) REFERENCES Student(RollNo),
+  FOREIGN KEY (SubjectID) REFERENCES Subject(SubjectID)
+);
+
+INSERT INTO Student_Subject VALUES
+(1, 101, 'A'),
+(1, 102, 'B'),
+(2, 101, 'A'),
+(2, 103, 'B');
+
+Verification with a JOIN:-
+You can reconstruct the full data using a join:
+ SELECT
+       s.RollNo,
+       s.Name,
+       sub.SubjectName,
+       ss.Grade
+ FROM
+       Student s
+       INNER JOIN Student_Subject ss ON s.RollNo = ss.RollNo
+       INNER JOIN Subject sub ON ss.SubjectID = sub.SubjectID
+ ORDER BY s.RollNo;
++--------+---------+-------------+-------+
+| RollNo | Name    | SubjectName | Grade |
++--------+---------+-------------+-------+
+|      1 | Amit    | Maths       | A     |
+|      1 | Amit    | English     | B     |
+|      2 | Dheeraj | Maths       | A     |
+|      2 | Dheeraj | Science     | B     |
++--------+---------+-------------+-------+
+
+********************************************************************************
+3nf:-
+Step 1: Create Database:- CREATE DATABASE 3nf;  
+use 3nf;
+Step 2: Table Before 3NF (Has Transitive Dependency)
+
+RollNo	Name	SubjectID	SubjectName	TeacherName
+1	Amit	101		Maths		Mr. Sharma
+2	Dheeraj	101		Maths		Mr. Sharma
+3	Lalit	102		English		Ms. Neha
+4	Parul	103		Science		Mr. Raj
+This table has all information (Student + Subject + Teacher) in one place.
+Problem: TeacherName depends on SubjectID, not on RollNo.
+CREATE TABLE StudentSubject_Before3NF (
+  RollNo INT,
+  Name VARCHAR(100),
+  SubjectID INT,
+  SubjectName VARCHAR(100),
+  TeacherName VARCHAR(100),
+  PRIMARY KEY (RollNo, SubjectID)
+);
+Insert Data
+INSERT INTO StudentSubject_Before3NF VALUES
+(1, 'Amit', 101, 'Maths', 'Mr. Sharma'),
+(2, 'Dheeraj', 101, 'Maths', 'Mr. Sharma'),
+(3, 'Lalit', 102, 'English', 'Ms. Neha'),
+(4, 'Parul', 103, 'Science', 'Mr. Raj');
+View Data
+
+Transitive Dependency:
+RollNo → SubjectID → TeacherName
+
+✅ Step 3: Convert to 3NF (Remove Transitive Dependency)
+
+We divide into 3 separate tables:
+1st Student Table:
++--------+---------+
+| RollNo | Name    |
++--------+---------+
+|      1 | Amit    |
+|      2 | Dheeraj |
+|      3 | Lalit   |
+|      4 | Parul   |
++--------+---------+
+ CREATE TABLE Student (
+  RollNo INT PRIMARY KEY,
+  Name VARCHAR(100)
+);
+
+INSERT INTO Student VALUES
+(1, 'Amit'),
+(2, 'Dheeraj'),
+(3, 'Lalit'),
+(4, 'Parul');
+
+2nd Subject Table:-
++-----------+-------------+-------------+
+| SubjectID | SubjectName | TeacherName |
++-----------+-------------+-------------+
+|       101 | Maths       | Mr. Sharma  |
+|       102 | English     | Ms. Neha    |
+|       103 | Science     | Mr. Raj     |
++-----------+-------------+-------------+
+
+CREATE TABLE Subject (
+  SubjectID INT PRIMARY KEY,
+  SubjectName VARCHAR(100),
+  TeacherName VARCHAR(100)
+);
+
+INSERT INTO Subject VALUES
+(101, 'Maths', 'Mr. Sharma'),
+(102, 'English', 'Ms. Neha'),
+(103, 'Science', 'Mr. Raj');
+
+3rd Student_Subject (Mapping Table):-
+CREATE TABLE Student_Subject (
+  RollNo INT,
+  SubjectID INT,
+  PRIMARY KEY (RollNo, SubjectID),
+  FOREIGN KEY (RollNo) REFERENCES Student(RollNo),
+  FOREIGN KEY (SubjectID) REFERENCES Subject(SubjectID)
+);
+
+INSERT INTO Student_Subject VALUES
+(1, 101),
+(2, 101),
+(3, 102),
+(4, 103);
+
+SELECT * FROM Student_Subject;
++--------+-----------+
+| RollNo | SubjectID |
++--------+-----------+
+|      1 |       101 |
+|      2 |       101 |
+|      3 |       102 |
+|      4 |       103 |
++--------+-----------+
+
+Step 4: Retrieve Full Data Using JOIN
+SELECT 
+  s.RollNo,
+  s.Name,
+  sub.SubjectName,
+  sub.TeacherName
+FROM 
+  Student s
+  INNER JOIN Student_Subject ss ON s.RollNo = ss.RollNo
+  INNER JOIN Subject sub ON ss.SubjectID = sub.SubjectID
+ORDER BY s.RollNo;
++--------+---------+-------------+-------------+
+| RollNo | Name    | SubjectName | TeacherName |
++--------+---------+-------------+-------------+
+|      1 | Amit    | Maths       | Mr. Sharma  |
+|      2 | Dheeraj | Maths       | Mr. Sharma  |
+|      3 | Lalit   | English     | Ms. Neha    |
+|      4 | Parul   | Science     | Mr. Raj     |
++--------+---------+-------------+-------------+
+
+*********************************************************************
+BCNF:-
+BCNF (Boyce–Codd Normal Form) is a stronger version of 3NF.
+
+Rule:A table is in BCNF if:
+For every functional dependency (X → Y), X must be a super key.
+In simple terms:
+In 3NF, some non-super key dependencies are allowed (if Y is a prime attribute).
+In BCNF, no exceptions — every determinant must be a key.
+
+Step 1: Before BCNF (3NF Table)
+
+Let’s consider the 3NF version we made earlier:
+
+3NF Table (Example)
+RollNo	Name	SubjectID	SubjectName	TeacherName
+1	Amit	101		Maths		Mr. Sharma
+2	Dheeraj	101		Maths		Mr. Sharma
+3	Lalit	102		English		Ms. Neha
+4	Parul	103		Science		Mr. Raj
+SQL query for this table:-
+CREATE TABLE StudentSubjectTeacher (
+  RollNo INT,
+  Name VARCHAR(100),
+  SubjectID INT,
+  SubjectName VARCHAR(100),
+  TeacherName VARCHAR(100),
+  PRIMARY KEY (RollNo, SubjectID)
+);
+INSERT INTO StudentSubjectTeacher VALUES
+(1, 'Amit', 101, 'Maths', 'Mr. Sharma'),
+(2, 'Dheeraj', 101, 'Maths', 'Mr. Sharma'),
+(3, 'Lalit', 102, 'English', 'Ms. Neha'),
+(4, 'Parul', 103, 'Science', 'Mr. Raj');
+
+
+Suppose new rule:
+
+Each Teacher teaches only one subject,
+but one subject can be taught by many teachers (team teaching).
+
+Now we have:
+
+TeacherName → SubjectID
+This violates BCNF because TeacherName is not a key, but it determines SubjectID.
+
+Step 2: Convert to BCNF
+
+We’ll split the table to remove this dependency.
+
+Now we’ll have four tables:
+
+1️. Student — Student details
+2️. Subject — Subject details
+3️. Teacher — Teacher details (each teacher teaches one subject)
+4️. Student_Teacher — mapping between students and teachers
+
+✅ Step 3: SQL Implementation
+
+1️. Student table 
++--------+---------+
+| RollNo | Name    |
++--------+---------+
+|      1 | Amit    |
+|      2 | Dheeraj |
+|      3 | Lalit   |
+|      4 | Parul   |
++--------+---------+
+CREATE TABLE Student (
+  RollNo INT PRIMARY KEY,
+  Name VARCHAR(100)
+);
+
+INSERT INTO Student VALUES
+(1, 'Amit'),
+(2, 'Dheeraj'),
+(3, 'Lalit'),
+(4, 'Parul');
+
+2. Subject table:
++-----------+-------------+
+| SubjectID | SubjectName |
++-----------+-------------+
+|       101 | Maths       |
+|       102 | English     |
+|       103 | Science     |
++-----------+-------------+
+CREATE TABLE Subject (
+  SubjectID INT PRIMARY KEY,
+  SubjectName VARCHAR(100)
+);
+
+INSERT INTO Subject VALUES
+(101, 'Maths'),
+(102, 'English'),
+(103, 'Science');
+
+3️. Teacher table:
++-----------+-------------+-----------+
+| TeacherID | TeacherName | SubjectID |
++-----------+-------------+-----------+
+|         1 | Mr. Sharma  |       101 |
+|         2 | Ms. Neha    |       102 |
+|         3 | Mr. Raj     |       103 |
++-----------+-------------+-----------+
+CREATE TABLE Teacher (
+  TeacherID INT PRIMARY KEY,
+  TeacherName VARCHAR(100),
+  SubjectID INT,
+  FOREIGN KEY (SubjectID) REFERENCES Subject(SubjectID)
+);
+
+INSERT INTO Teacher VALUES
+(1, 'Mr. Sharma', 101),
+(2, 'Ms. Neha', 102),
+(3, 'Mr. Raj', 103);
+
+5. Student_Teacher Mapping (who learns from which teacher)
++--------+-----------+
+| RollNo | TeacherID |
++--------+-----------+
+|      1 |         1 |
+|      2 |         1 |
+|      3 |         2 |
+|      4 |         3 |
++--------+-----------+
+CREATE TABLE Student_Teacher (
+  RollNo INT,
+  TeacherID INT,
+  PRIMARY KEY (RollNo, TeacherID),
+  FOREIGN KEY (RollNo) REFERENCES Student(RollNo),
+  FOREIGN KEY (TeacherID) REFERENCES Teacher(TeacherID)
+);
+
+INSERT INTO Student_Teacher VALUES
+(1, 1),
+(2, 1),
+(3, 2),
+(4, 3);
+
+Step 4: Retrieve Complete Data (JOIN)
+SELECT 
+  s.RollNo,
+  s.Name,
+  sub.SubjectName,
+  t.TeacherName
+FROM 
+  Student s
+  INNER JOIN Student_Teacher st ON s.RollNo = st.RollNo
+  INNER JOIN Teacher t ON st.TeacherID = t.TeacherID
+  INNER JOIN Subject sub ON t.SubjectID = sub.SubjectID
+ORDER BY s.RollNo;
+
++--------+---------+-------------+-------------+
+| RollNo | Name    | SubjectName | TeacherName |
++--------+---------+-------------+-------------+
+|      1 | Amit    | Maths       | Mr. Sharma  |
+|      2 | Dheeraj | Maths       | Mr. Sharma  |
+|      3 | Lalit   | English     | Ms. Neha    |
+|      4 | Parul   | Science     | Mr. Raj     |
++--------+---------+-------------+-------------+
+
+**************************************************************************
+4NF (Fourth Normal Form):- A table is in 4NF if:
+
+It is already in BCNF and has no multi-valued dependencies (MVDs)
+Rule:
+If a table has two or more independent multi-valued facts about the same key, separate them into different tables.
+
+Step 1: Before 4NF (Has Multi-Valued Dependency)
+
+Suppose we extend our system —
+A student can have multiple hobbies and speak multiple languages.
+
+RollNo	Hobby		Language
+1	Painting	English
+1	Painting	Hindi
+1	Singing		English
+1	Singing		Hindi
+
+✅ Here:
+
+RollNo →→ Hobby (multi-valued)
+
+RollNo →→ Language (multi-valued)
+
+Hobby and Language are independent of each other.
+
+That means there are two independent multi-valued dependencies, violating 4NF.
+
+Step 2: Convert to 4NF
+
+We split the table into two separate tables:
+
+1️. Student_Hobby
+
+RollNo	Hobby
+1	Painting
+1	Singing
+
+2️. Student_Language
+
+RollNo	Language
+1	English
+1	Hindi
+
+Now each table has only one multi-valued fact about the key — ✅ 4NF achieved
+
+Step 3: SQL Implementation
+CREATE TABLE Student_Hobby (
+  RollNo INT,
+  Hobby VARCHAR(100),
+  PRIMARY KEY (RollNo, Hobby),
+  FOREIGN KEY (RollNo) REFERENCES Student(RollNo)
+);
+
+INSERT INTO Student_Hobby VALUES
+(1, 'Painting'),
+(1, 'Singing');
+
+ SELECT *FROM Student_Hobby;
++--------+----------+
+| RollNo | Hobby    |
++--------+----------+
+|      1 | Painting |
+|      1 | Singing  |
++--------+----------+
+
+CREATE TABLE Student_Language (
+  RollNo INT,
+  Language VARCHAR(100),
+  PRIMARY KEY (RollNo, Language),
+  FOREIGN KEY (RollNo) REFERENCES Student(RollNo)
+);
+
+INSERT INTO Student_Language VALUES
+(1, 'English'),
+(1, 'Hindi');
+
+ SELECT * FROM Student_Language;
++--------+----------+
+| RollNo | Language |
++--------+----------+
+|      1 | English  |
+|      1 | Hindi    |
++--------+----------+
+
+✅ Now both tables are in 4NF, as no independent multi-valued dependencies remain.
+
+Step 4: Retrieve Combined Data (Optional Join)
+SELECT s.RollNo, s.Name, h.Hobby, l.Language
+FROM Student s
+JOIN Student_Hobby h ON s.RollNo = h.RollNo
+JOIN Student_Language l ON s.RollNo = l.RollNo
+ORDER BY s.RollNo;
+
+Output:
+
+RollNo	Name	Hobby		Language
+1	Amit	Painting	English
+1	Amit	Painting	Hindi
+1	Amit	Singing		English
+1	Amit	Singing		Hindi
+
+*******************************************************************************************************
+5NF (Fifth Normal Form):-A table is in 5NF (also called Project-Join Normal Form) if:
+
+It is already in 4NF and cannot be decomposed further without losing information
+
+👉 Rule:
+A table is in 5NF if every join dependency is implied by candidate keys.
+It means the table cannot be broken further without causing data loss.
+
+Step 1: Before 5NF (Has Join Dependency)
+
+Suppose we have this table:
+
+Course	Book	Author
+DBMS	SQL	Codd
+DBMS	RDB	Codd
+DBMS	SQL	Date
+
+Now —
+Look at all columns carefully 👀
+A Course can have many Books
+A Book can have many Authors
+A Course can have many Authors
+So, to uniquely identify each record, you need all three columns together.
+
+Therefore,Candidate Key = (Course, Book, Author)
+No single column or pair of columns can uniquely identify a record.
+
+Step 3: Role of Candidate Key in 5NF
+
+The candidate key controls how decomposition happens.
+When we decompose the table into:
+Course_Book (Course, Book)
+Book_Author (Book, Author)
+Course_Author (Course, Author)
+
+Each smaller table still represents part of the relationship that involves 
+attributes from the candidate key (Course, Book, Author).
+
+Step 4: Why Candidate Key Is Important Here
+
+Let’s see what happens with and without respecting the candidate key.Case 1: Using Candidate Key (Correct)
+
+Decomposition is based on Course, Book, and Author — all part of the key.
+When you join back on these, you get the exact original records.
+No duplication and no missing data. Valid 5NF decomposition.
+
+❌ Case 2: Ignoring Candidate Key (Wrong)
+
+Imagine you split the table as:
+
+Book_Author (Book, Author)
+
+Course (Course only)
+
+Now, when you join them, you’ll produce wrong combinations like:
+
+Course	Book	Author
+DBMS	SQL	Codd
+DBMS	SQL	Date
+DBMS	RDB	Codd
+✅ This looks okay for DBMS,		
+but if another course (say, OS) also used SQL, it would create false combinations (OS–Codd–RDB etc).		
+
+❌ This happens because the join dependency is not implied by the candidate key.
+Step 5: Convert to 5NF
+The decomposition only uses subsets of the candidate key,
+and when you join them back using the key relationships,
+you can perfectly reconstruct the original table.
+We decompose into three tables that capture all relationships:
+
+1️.Course_Book
+
+Course	Book
+DBMS	SQL
+DBMS	RDB
+
+2️. Book_Author
+
+Book	Author
+SQL	Codd
+RDB	Codd
+SQL	Date
+
+3️. Course_Author
+
+Course	Author
+DBMS	Codd
+DBMS	Date
+
+Now all join dependencies are handled — ✅ 5NF achieved
+
+Step 6: SQL Implementation
+
+CREATE TABLE Course_Book (
+  Course VARCHAR(100),
+  Book VARCHAR(100),
+  PRIMARY KEY (Course, Book)
+);
+
+INSERT INTO Course_Book VALUES
+('DBMS', 'SQL'),
+('DBMS', 'RDB');
+ SELECT * FROM Course_Book;
++--------+------+
+| Course | Book |
++--------+------+
+| DBMS   | RDB  |
+| DBMS   | SQL  |
++--------+------+
+
+CREATE TABLE Book_Author (
+  Book VARCHAR(100),
+  Author VARCHAR(100),
+  PRIMARY KEY (Book, Author)
+);
+
+INSERT INTO Book_Author VALUES
+('SQL', 'Codd'),
+('RDB', 'Codd'),
+('SQL', 'Date');
+
+
+mysql> SELECT * FROM  Book_Author;
++------+--------+
+| Book | Author |
++------+--------+
+| RDB  | Codd   |
+| SQL  | Codd   |
+| SQL  | Date   |
++------+--------+
+
+CREATE TABLE Course_Author (
+  Course VARCHAR(100),
+  Author VARCHAR(100),
+  PRIMARY KEY (Course, Author)
+);
+
+INSERT INTO Course_Author VALUES
+('DBMS', 'Codd'),
+('DBMS', 'Date');
+
+ SELECT * FROM Course_Author;
++--------+--------+
+| Course | Author |
++--------+--------+
+| DBMS   | Codd   |
+| DBMS   | Date   |
++--------+--------+
+
+Step 4: Join to Retrieve Complete Data
+SELECT cb.Course, cb.Book, ba.Author
+FROM Course_Book cb
+JOIN Book_Author ba ON cb.Book = ba.Book
+JOIN Course_Author ca ON cb.Course = ca.Course AND ba.Author = ca.Author
+ORDER BY cb.Course;
+
+Output:
+
+Course	Book	Author
+DBMS	SQL	Codd
+DBMS	RDB	Codd
+DBMS	SQL	Date
+
+Matches the original table perfectly → 5NF achieved
