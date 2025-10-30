@@ -1,0 +1,441 @@
+A JOIN is used in SQL to combine rows from two or more tables based on a related column between them.Example situation:
+
+1st Table:- Student Table 
+
+RollNo	Name	DeptID
+1	Riya	10
+2	Amit	20
+3	Sanya	10
+
+2nd Table:- Department Table 
+
+DeptID	DeptName
+10	Accounts
+20	Sales
+30	Marketing
+
+We want to show each student with their department name — that’s where JOIN helps.
+**************************************************************************************************************************
+Types of Joins:-
+
+There are mainly 4 types of joins:
+
+1. INNER JOIN:-
+An INNER JOIN in SQL returns only the rows that have matching values in 
+both tables based on a specified common column (usually a primary key–foreign key relationship).
+If there is no match between the two tables, that row is not included in the result.
+Hence, no NULL values appear in an INNER JOIN result.
+
+mysql> use mysql;
+Database changed
+
+Create 1st Table:-
+mysql> CREATE TABLE Student (
+       RollNo INT PRIMARY KEY,
+       Name VARCHAR(50) NOT NULL,
+       DeptID INT,
+       Age INT,
+       AdmissionDate DATE
+     );
+mysql> INSERT INTO Student (RollNo, Name, DeptID, Age) VALUES
+     (1, 'Riya Sharma', 10, 20),
+     (2, 'Amit Verma', 20, 21),
+     (3, 'Sanya Kapoor', 10, 22),
+     (4, 'Deepak Gupta', NULL, 23);
++--------+--------------+--------+------+---------------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate |
++--------+--------------+--------+------+---------------+
+|      1 | Riya Sharma  |     10 |   20 | NULL          |
+|      2 | Amit Verma   |     20 |   21 | NULL          |
+|      3 | Sanya Kapoor |     10 |   22 | NULL          |
+|      4 | Deepak Gupta |   NULL |   23 | NULL          |
++--------+--------------+--------+------+---------------+
+
+Create 2nd Table:-
+mysql> CREATE TABLE Department (
+         DeptID INT PRIMARY KEY,
+        DeptName VARCHAR(100) NOT NULL
+     );
+mysql> INSERT INTO Department (DeptID, DeptName) VALUES
+     (10, 'Accounts'),
+     (20, 'Sales'),
+     (30, 'Marketing');
++--------+-----------+
+| DeptID | DeptName  |
++--------+-----------+
+|     10 | Accounts  |
+|     20 | Sales     |
+|     30 | Marketing |
++--------+-----------+
+INNER JOIN:-
+mysql>SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+INNER JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID;
+
++--------+--------------+--------+------+---------------+----------+
+| RollNo | Name         | DeptId | Age  | AdmissionDate | DeptName |
++--------+--------------+--------+------+---------------+----------+
+|      1 | Riya Sharma  |     10 |   20 | NULL          | Accounts |
+|      2 | Amit Verma   |     20 |   21 | NULL          | Sales    |
+|      3 | Sanya Kapoor |     10 |   22 | NULL          | Accounts |
++--------+--------------+--------+------+---------------+----------+
+********************************************************************************************************************
+2). LEFT JOIN (or LEFT OUTER JOIN)
+
+Returns all rows from the left table (Student) and the matching rows from the right table (Department).
+If there’s no match, it still returns the left table’s row but shows NULL for the right side.
+1st Table: Student
++--------+--------------+--------+------+---------------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate |
++--------+--------------+--------+------+---------------+
+|      1 | Riya Sharma  |     10 |   20 | 2022-07-01    |
+|      2 | Amit Verma   |     20 |   21 | 2021-06-15    |
+|      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    |
+|      4 | Deepak Gupta |   NULL |   23 | 2023-05-10    |
++--------+--------------+--------+------+---------------+
+
+2nd Table: Department
+CREATE TABLE Department (
+    DeptID INT PRIMARY KEY,
+    DeptName VARCHAR(100) NOT NULL
+);
+INSERT INTO Department (DeptID, DeptName) VALUES
+(10, 'Accounts'),
+(20, 'Sales'),
+(30, 'Marketing');
+
++--------+-----------+
+| DeptID | DeptName  |
++--------+-----------+
+|     10 | Accounts  |
+|     20 | Sales     |
+|     30 | Marketing |
++--------+-----------+
+ LEFT JOIN Query:
+SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+LEFT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID;
++--------+--------------+--------+------+---------------+----------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate | DeptName |
++--------+--------------+--------+------+---------------+----------+
+|      1 | Riya Sharma  |     10 |   20 | 2022-07-01    | Accounts |
+|      2 | Amit Verma   |     20 |   21 | 2021-06-15    | Sales    |
+|      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    | Accounts |
+|      4 | Deepak Gupta |   NULL |   23 | 2023-05-10    | NULL     |
++--------+--------------+--------+------+---------------+----------+
+****************************************************************************************************************
+ 3. RIGHT JOIN:-A RIGHT JOIN in SQL returns all rows from the right table (in this case, Department),
+and the matching rows from the left table (Student).
+If there is no matching record in the left table, SQL fills the columns from the left table with NULL values.
+
+In simple terms: RIGHT JOIN keeps all the records from the right table,
+and includes matching records from the left table.
+When no match is found, NULL values appear for columns of the left table.
+1st Table: Student
++--------+--------------+--------+------+---------------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate |
++--------+--------------+--------+------+---------------+
+|      1 | Riya Sharma  |     10 |   20 | 2022-07-01    |
+|      2 | Amit Verma   |     20 |   21 | 2021-06-15    |
+|      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    |
+|      4 | Deepak Gupta |   NULL |   23 | 2023-05-10    |
++--------+--------------+--------+------+---------------+
+2nd Table: Department
++--------+-----------+
+| DeptID | DeptName  |
++--------+-----------+
+|     10 | Accounts  |
+|     20 | Sales     |
+|     30 | Marketing |
++--------+-----------+
+ Right JOIN Query:
+SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+RIGHT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID;
++--------+--------------+--------+------+---------------+-----------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate | DeptName  |
++--------+--------------+--------+------+---------------+-----------+
+|      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    | Accounts  |
+|      1 | Riya Sharma  |     10 |   20 | 2022-07-01    | Accounts  |
+|      2 | Amit Verma   |     20 |   21 | 2021-06-15    | Sales     |
+|   NULL | NULL         |   NULL | NULL | NULL          | Marketing |
++--------+--------------+--------+------+---------------+-----------+
+DeptID (Right Table)	Matching Students	What Appears
+10 (Accounts)		Riya (1), Sanya (3)	2 rows with full Student data
+20 (Sales)		Amit (2)		1 row
+30 (Marketing)		None			1 row, Student columns NULL
+Notes:-The order can change because SQL does not guarantee the order of results unless you use an ORDER BY clause.
+DeptID 10 matches two students (RollNo 1 and 3), DeptID 20 matches one (RollNo 2), and DeptID 30 has no match, 
+so NULL values are filled for student data but "Marketing" still appears 
+because it’s part of the right table in the RIGHT JOIN.
+QL tables (like SELECT output) are unordered sets —
+that means, if you don’t use ORDER BY,
+the order of rows can change (1,3,2 or 3,1,2).
+
+✅ To make it fixed, you must add:
+
+ORDER BY s.RollNo;
+or
+
+ORDER BY d.DeptID;
+
+SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+RIGHT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID
+ORDER BY s.RollNo;
++--------+--------------+--------+------+---------------+-----------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate | DeptName  |
++--------+--------------+--------+------+---------------+-----------+
+|   NULL | NULL         |   NULL | NULL | NULL          | Marketing |
+|      1 | Riya Sharma  |     10 |   20 | NULL          | Accounts  |
+|      2 | Amit Verma   |     20 |   21 | NULL          | Sales     |
+|      3 | Sanya Kapoor |     10 |   22 | NULL          | Accounts  |
++--------+--------------+--------+------+---------------+-----------+
+or using ORDER BY d.DeptID;
+SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+RIGHT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID
+ORDER BY d.DeptID;
++--------+--------------+--------+------+---------------+-----------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate | DeptName  |
++--------+--------------+--------+------+---------------+-----------+
+|      3 | Sanya Kapoor |     10 |   22 | NULL          | Accounts  |
+|      1 | Riya Sharma  |     10 |   20 | NULL          | Accounts  |
+|      2 | Amit Verma   |     20 |   21 | NULL          | Sales     |
+|   NULL | NULL         |   NULL | NULL | NULL          | Marketing |
++--------+--------------+--------+------+---------------+-----------+
+**********************************************************************************************************************
+4. FULL JOIN (Full Outer Join): returns all records from both tables,
+whether there is a match or not between them.
+
+If there is a match, it combines the data from both tables.
+If there is no match, SQL fills NULL values for the missing side.
+
+In simple terms 👇
+FULL JOIN = LEFT JOIN + RIGHT JOIN
+It shows all rows from both tables, matching or not.
+MySQL doesn’t support FULL JOIN directly,
+so we create it using UNION of LEFT + RIGHT joins.
+SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+LEFT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID
+
+UNION
+
+SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptName
+FROM 
+    Student s
+RIGHT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID;
++--------+--------------+--------+------+---------------+-----------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate | DeptName  |
++--------+--------------+--------+------+---------------+-----------+
+|      1 | Riya Sharma  |     10 |   20 | 2022-07-01    | Accounts  |
+|      2 | Amit Verma   |     20 |   21 | 2021-06-15    | Sales     |
+|      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    | Accounts  |
+|      4 | Deepak Gupta |   NULL |   23 | 2023-05-10    | NULL      |
+|   NULL | NULL         |   NULL | NULL | NULL          | Marketing |
++--------+--------------+--------+------+---------------+-----------+
+or use:- 
+SELECT 
+    s.*, d.*
+FROM 
+    Student s
+LEFT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID
+
+UNION
+
+SELECT 
+    s.*, d.*
+FROM 
+    Student s
+RIGHT JOIN 
+    Department d
+ON 
+    s.DeptID = d.DeptID;
+output will be same
++--------+--------------+--------+------+---------------+--------+-----------+
+| RollNo | Name         | DeptID | Age  | AdmissionDate | DeptID | DeptName  |
++--------+--------------+--------+------+---------------+--------+-----------+
+|      1 | Riya Sharma  |     10 |   20 | NULL          |     10 | Accounts  |
+|      2 | Amit Verma   |     20 |   21 | NULL          |     20 | Sales     |
+|      3 | Sanya Kapoor |     10 |   22 | NULL          |     10 | Accounts  |
+|      4 | Deepak Gupta |   NULL |   23 | NULL          |   NULL | NULL      |
+|   NULL | NULL         |   NULL | NULL | NULL          |     30 | Marketing |
++--------+--------------+--------+------+---------------+--------+-----------+
+**********************************************************************************************************************
+5. CROSS JOIN:- A CROSS JOIN in SQL returns the Cartesian product of two tables —
+that means, it combines every row from the first table with every row from the second table.
+simple words:
+
+CROSS JOIN = “All possible combinations” of rows from both tables.
+
+There is no condition (like ON) used in a CROSS JOIN.
+If the first table has A rows and the second table has B rows,
+the result will have A × B rows.
+SELECT 
+    s.RollNo,
+    s.Name,
+    d.DeptID,
+    d.DeptName
+FROM 
+    Student s
+CROSS JOIN 
+    Department d;
++--------+--------------+--------+-----------+
+| RollNo | Name         | DeptID | DeptName  |
++--------+--------------+--------+-----------+
+|      1 | Riya Sharma  |     30 | Marketing |
+|      1 | Riya Sharma  |     20 | Sales     |
+|      1 | Riya Sharma  |     10 | Accounts  |
+|      2 | Amit Verma   |     30 | Marketing |
+|      2 | Amit Verma   |     20 | Sales     |
+|      2 | Amit Verma   |     10 | Accounts  |
+|      3 | Sanya Kapoor |     30 | Marketing |
+|      3 | Sanya Kapoor |     20 | Sales     |
+|      3 | Sanya Kapoor |     10 | Accounts  |
+|      4 | Deepak Gupta |     30 | Marketing |
+|      4 | Deepak Gupta |     20 | Sales     |
+|      4 | Deepak Gupta |     10 | Accounts  |
++--------+--------------+--------+-----------+
+SELECT 
+   SELECT 
+    s.RollNo,
+    s.Name,
+    s.DeptID AS StudentDeptID,
+    s.Age,
+    s.AdmissionDate,
+    d.DeptID AS DepartmentDeptID,
+    d.DeptName
+FROM 
+    Student AS s
+CROSS JOIN 
+    Department AS d;
+
++--------+--------------+---------------+------+---------------+------------------+-----------+
+| RollNo | Name         | StudentDeptID | Age  | AdmissionDate | DepartmentDeptID | DeptName  |
++--------+--------------+---------------+------+---------------+------------------+-----------+
+|      1 | Riya Sharma  |            10 |   20 | NULL          |               30 | Marketing |
+|      1 | Riya Sharma  |            10 |   20 | NULL          |               20 | Sales     |
+|      1 | Riya Sharma  |            10 |   20 | NULL          |               10 | Accounts  |
+|      2 | Amit Verma   |            20 |   21 | NULL          |               30 | Marketing |
+|      2 | Amit Verma   |            20 |   21 | NULL          |               20 | Sales     |
+|      2 | Amit Verma   |            20 |   21 | NULL          |               10 | Accounts  |
+|      3 | Sanya Kapoor |            10 |   22 | NULL          |               30 | Marketing |
+|      3 | Sanya Kapoor |            10 |   22 | NULL          |               20 | Sales     |
+|      3 | Sanya Kapoor |            10 |   22 | NULL          |               10 | Accounts  |
+|      4 | Deepak Gupta |          NULL |   23 | NULL          |               30 | Marketing |
+|      4 | Deepak Gupta |          NULL |   23 | NULL          |               20 | Sales     |
+|      4 | Deepak Gupta |          NULL |   23 | NULL          |               10 | Accounts  |
++--------+--------------+---------------+------+---------------+------------------+-----------+
+or 
+ SELECT
+         s.RollNo,
+         s.Name,
+         s.Age,
+         s.AdmissionDate,
+         d.DeptID,
+         d.DeptName
+     FROM
+         Student AS s
+     CROSS JOIN
+         Department AS d;
++--------+--------------+------+---------------+--------+-----------+
+| RollNo | Name         | Age  | AdmissionDate | DeptID | DeptName  |
++--------+--------------+------+---------------+--------+-----------+
+|      1 | Riya Sharma  |   20 | NULL          |     30 | Marketing |
+|      1 | Riya Sharma  |   20 | NULL          |     20 | Sales     |
+|      1 | Riya Sharma  |   20 | NULL          |     10 | Accounts  |
+|      2 | Amit Verma   |   21 | NULL          |     30 | Marketing |
+|      2 | Amit Verma   |   21 | NULL          |     20 | Sales     |
+|      2 | Amit Verma   |   21 | NULL          |     10 | Accounts  |
+|      3 | Sanya Kapoor |   22 | NULL          |     30 | Marketing |
+|      3 | Sanya Kapoor |   22 | NULL          |     20 | Sales     |
+|      3 | Sanya Kapoor |   22 | NULL          |     10 | Accounts  |
+|      4 | Deepak Gupta |   23 | NULL          |     30 | Marketing |
+|      4 | Deepak Gupta |   23 | NULL          |     20 | Sales     |
+|      4 | Deepak Gupta |   23 | NULL          |     10 | Accounts  |
++--------+--------------+------+---------------+--------+-----------+
+CROSS JOIN = every student × every department
+→ No condition, just combinations.
+
+
+Join Type	Shows All Students?	Shows All Departments?	NULL Fills	Description
+LEFT JOIN	✅ Yes			❌ No			Dept side	All students, missing dept = NULL
+RIGHT JOIN	❌ No			✅ Yes			Student side	All depts, missing student = NULL
+FULL JOIN	✅ Yes			✅ Yes			Both sides	Combines unmatched from both
+CROSS JOIN	✅ Yes			✅ Yes			No		All possible combinations
+
+
+
