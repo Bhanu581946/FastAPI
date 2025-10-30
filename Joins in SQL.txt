@@ -184,7 +184,7 @@ ON
     s.DeptID = d.DeptID;
 +--------+--------------+--------+------+---------------+-----------+
 | RollNo | Name         | DeptID | Age  | AdmissionDate | DeptName  |
-+--------+--------------+--------+------+---------------+-----------+
++--------+--------------+--------+------+---------------+-----------+ 
 |      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    | Accounts  |
 |      1 | Riya Sharma  |     10 |   20 | 2022-07-01    | Accounts  |
 |      2 | Amit Verma   |     20 |   21 | 2021-06-15    | Sales     |
@@ -258,7 +258,7 @@ ORDER BY d.DeptID;
 4. FULL JOIN (Full Outer Join): returns all records from both tables,
 whether there is a match or not between them.
 
-If there is a match, it combines the data from both tables.
+If there is a match, it combines the data from both tables. 
 If there is no match, SQL fills NULL values for the missing side.
 
 In simple terms 👇
@@ -429,6 +429,8 @@ or
 +--------+--------------+------+---------------+--------+-----------+
 CROSS JOIN = every student × every department
 → No condition, just combinations.
+“No condition join” = “All possible combinations”
+It’s not used very often in real projects, but when you need combinations, it’s extremely powerful.
 
 
 Join Type	Shows All Students?	Shows All Departments?	NULL Fills	Description
