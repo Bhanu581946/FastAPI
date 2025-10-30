@@ -433,11 +433,13 @@ CROSS JOIN = every student × every department
 It’s not used very often in real projects, but when you need combinations, it’s extremely powerful.
 
 
-Join Type	Shows All Students?	Shows All Departments?	NULL Fills	Description
-LEFT JOIN	✅ Yes			❌ No			Dept side	All students, missing dept = NULL
-RIGHT JOIN	❌ No			✅ Yes			Student side	All depts, missing student = NULL
-FULL JOIN	✅ Yes			✅ Yes			Both sides	Combines unmatched from both
-CROSS JOIN	✅ Yes			✅ Yes			No		All possible combinations
+| Join Type           | Shows All Students? (Left Table)| Shows All Departments? (Right Table)| NULL Fill   | Description                                                                  |
+| --------------------| ------------------------------- | ------------------------------------| ----------- | ---------------------------------------------------------------------------- |
+| INNER JOIN          | ❌ No                           | ❌ No                               | None        | Shows only rows where `DeptID` matches in both tables. (Common records only) |
+| LEFT JOIN           | ✅ Yes                          | ❌ No                               | Dept side   | Shows all students. If no matching department, `DeptName = NULL`.            |
+| RIGHT JOIN          | ❌ No                           | ✅ Yes                              | Student side| Shows all departments. If no matching student, student columns = `NULL`.     |
+| FULL JOIN(via UNION)| ✅ Yes                          | ✅ Yes                              | Both sides  | Combines unmatched rows from both tables; missing data filled with `NULL`.   |
+| CROSS JOIN          | ✅ Yes                          | ✅ Yes                              | None        | Shows all possible combinations (A × B). No condition or matching required.  |
 
 
 
