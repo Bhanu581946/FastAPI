@@ -3,7 +3,8 @@ Main Purpose (Why Joins Are Used)
 
 Joins are used when data is stored in multiple tables but you want to see it together in one result.
 
-In databases, we usually store related information in separate tables for better organization and to avoid duplication.
+In databases, we usually store related information in separate tables for 
+better organization and to avoid duplication.
 👉 Joins help us bring that related data back together when needed.
 Example situation:
 
@@ -22,7 +23,7 @@ DeptID	DeptName
 30	Marketing
 
 We want to show each student with their department name — that’s where JOIN helps.
-**************************************************************************************************************************
+*************************************************************************************************************
 Types of Joins:-
 
 There are mainly 4 types of joins:
@@ -96,7 +97,7 @@ ON
 |      2 | Amit Verma   |     20 |   21 | NULL          | Sales    |
 |      3 | Sanya Kapoor |     10 |   22 | NULL          | Accounts |
 +--------+--------------+--------+------+---------------+----------+
-********************************************************************************************************************
+*************************************************************************************************************
 2). LEFT JOIN (or LEFT OUTER JOIN)
 
 Returns all rows from the left table (Student) and the matching rows from the right table (Department).
@@ -150,10 +151,12 @@ ON
 |      3 | Sanya Kapoor |     10 |   22 | 2023-08-20    | Accounts |
 |      4 | Deepak Gupta |   NULL |   23 | 2023-05-10    | NULL     |
 +--------+--------------+--------+------+---------------+----------+
-****************************************************************************************************************
- 3. RIGHT JOIN:-A RIGHT JOIN in SQL returns all rows from the right table (in this case, Department),
+*******************************************************************************************
+ 3. RIGHT JOIN:-A RIGHT JOIN in SQL returns all rows 
+from the right table (in this case, Department),
 and the matching rows from the left table (Student).
-If there is no matching record in the left table, SQL fills the columns from the left table with NULL values.
+If there is no matching record in the left table, SQL fills the columns 
+from the left table with NULL values.
 
 In simple terms: RIGHT JOIN keeps all the records from the right table,
 and includes matching records from the left table.
@@ -201,8 +204,10 @@ DeptID (Right Table)	Matching Students	What Appears
 10 (Accounts)		Riya (1), Sanya (3)	2 rows with full Student data
 20 (Sales)		Amit (2)		1 row
 30 (Marketing)		None			1 row, Student columns NULL
-Notes:-The order can change because SQL does not guarantee the order of results unless you use an ORDER BY clause.
-DeptID 10 matches two students (RollNo 1 and 3), DeptID 20 matches one (RollNo 2), and DeptID 30 has no match, 
+Notes:-The order can change because SQL does not guarantee 
+the order of results unless you use an ORDER BY clause.
+DeptID 10 matches two students (RollNo 1 and 3), 
+DeptID 20 matches one (RollNo 2), and DeptID 30 has no match, 
 so NULL values are filled for student data but "Marketing" still appears 
 because it’s part of the right table in the RIGHT JOIN.
 QL tables (like SELECT output) are unordered sets —
@@ -261,7 +266,7 @@ ORDER BY d.DeptID;
 |      2 | Amit Verma   |     20 |   21 | NULL          | Sales     |
 |   NULL | NULL         |   NULL | NULL | NULL          | Marketing |
 +--------+--------------+--------+------+---------------+-----------+
-**********************************************************************************************************************
+****************************************************************************************
 4. FULL JOIN (Full Outer Join): returns all records from both tables,
 whether there is a match or not between them.
 
@@ -341,9 +346,11 @@ output will be same
 |      4 | Deepak Gupta |   NULL |   23 | NULL          |   NULL | NULL      |
 |   NULL | NULL         |   NULL | NULL | NULL          |     30 | Marketing |
 +--------+--------------+--------+------+---------------+--------+-----------+
-**********************************************************************************************************************
-5. CROSS JOIN:- A CROSS JOIN in SQL returns the Cartesian product of two tables —
-that means, it combines every row from the first table with every row from the second table.
+****************************************************************************************
+5. CROSS JOIN:- A CROSS JOIN in SQL returns 
+the Cartesian product of two tables —
+that means, it combines every row from 
+the first table with every row from the second table.
 simple words:
 
 CROSS JOIN = “All possible combinations” of rows from both tables.
