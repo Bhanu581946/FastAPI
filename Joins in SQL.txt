@@ -1,4 +1,11 @@
-A JOIN is used in SQL to combine rows from two or more tables based on a related column between them.Example situation:
+A JOIN is used in SQL to combine rows from two or more tables based on a related column between them.
+Main Purpose (Why Joins Are Used)
+
+Joins are used when data is stored in multiple tables but you want to see it together in one result.
+
+In databases, we usually store related information in separate tables for better organization and to avoid duplication.
+👉 Joins help us bring that related data back together when needed.
+Example situation:
 
 1st Table:- Student Table 
 
