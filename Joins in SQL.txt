@@ -276,6 +276,10 @@ If there is no match, SQL fills NULL values for the missing side.
 In simple terms 👇
 FULL JOIN = LEFT JOIN + RIGHT JOIN
 It shows all rows from both tables, matching or not.
+
+Why FULL JOIN is Used: A FULL JOIN (also called FULL OUTER JOIN) is used 
+when you want to see all records from both tables —
+even if some rows do not have matching data in the other table.
 MySQL doesn’t support FULL JOIN directly,
 so we create it using UNION of LEFT + RIGHT joins.
 SELECT 
